@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  dps:
+    image: defreitas/dns-proxy-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/resolv.conf:/etc/resolv.conf
+    hostname: dns.mageddo
+    ports:
+      - 5380:5380
+
+  wordpress:
+    image: wordpress
+    environment:
+      WORDPRESS_DB_HOST: 'mysql.docker'
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - './wordpress:/var/www/html:rw'
+    container_name: xsswp
+    hostname: wp.docker
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - ./db:/var/lib/mysql
+    container_name: xssmysql
+    hostname: mysql.docker
+
+  apache:
+    image: docker.io/bitnami/apache:2.4
+    volumes:
+      - './apache:/var/www/html:rw'
+    container_name: xssapache
+    hostname: malicious-as.docker
+
+
+
+volumes:
+  wordpress:
+  db:
+  apache:
+
